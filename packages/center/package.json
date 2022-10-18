@@ -3,7 +3,9 @@
   "private": true,
   "version": "0.0.1",
   "type": "module",
-  "scripts": {},
+  "scripts": {
+    "build": "tsc"
+  },
   "dependencies": {
     "@trpc/server": "^10.0.0-proxy-beta.21",
     "fastify": "^4.9.0",

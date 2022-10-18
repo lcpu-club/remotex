@@ -5,7 +5,7 @@
     // "lib": [],
     // "experimentalDecorators": true,
     // "emitDecoratorMetadata": true,
-    "module": "NodeNext",
+    "module": "ESNext",
     "moduleResolution": "Node",
     "types": [],
     "declaration": true,
