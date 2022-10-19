@@ -1,20 +1,21 @@
 import { setupDb } from './db/index.js'
 import { setupHooks } from './hooks.js'
 import { logger } from './logger.js'
-import { IS_ENTRY_MODULE } from './util/index.js'
+import { Plugin, setupPlugins } from './plugin.js'
 
 declare module './mergeables.js' {
   interface IHookMap {
-    'db-connected': [Awaited<ReturnType<typeof setupDb>>]
+    'post-plugins-setup': [{ logger: typeof logger }]
+    'post-db-setup': [Awaited<ReturnType<typeof setupDb>>]
   }
 }
 
-async function startApp() {
+export async function startApp() {
   const hooks = await setupHooks()
+  await setupPlugins({ hooks })
+  await hooks.fire('post-plugins-setup', { logger })
   const db = await setupDb()
-  await hooks.fire('db-connected', db)
+  await hooks.fire('post-db-setup', db)
 }
 
-if (IS_ENTRY_MODULE) {
-  startApp().catch((err) => logger.error(err))
-}
+export { Plugin }

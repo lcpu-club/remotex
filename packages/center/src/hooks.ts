@@ -32,3 +32,5 @@ export async function setupHooks() {
 
   return { hook, fire }
 }
+
+export type Hooks = Awaited<ReturnType<typeof setupHooks>>

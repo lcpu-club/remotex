@@ -14,9 +14,11 @@ const factory =
 const str = factory((x) => x)
 // const num = factory((x) => parseInt(x, 10))
 // const bool = factory((x) => x === 'true')
-// const json = factory((x) => JSON.parse(x))
+const json = factory((x) => JSON.parse(x))
 
 export const MONGO_URI = str(
   'MONGO_URI',
   'mongodb://localhost:27017/remotex_center'
 )
+
+export const PLUGINS = json('PLUGINS', ['password-auth'])

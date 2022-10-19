@@ -3,8 +3,10 @@
   "private": true,
   "version": "0.0.1",
   "type": "module",
+  "main": "lib/index.js",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "start": "node lib/cli.js"
   },
   "dependencies": {
     "@trpc/server": "^10.0.0-proxy-beta.21",
