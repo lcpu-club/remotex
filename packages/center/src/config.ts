@@ -12,13 +12,18 @@ const factory =
     return transform(value)
   }
 const str = factory((x) => x)
-// const num = factory((x) => parseInt(x, 10))
+const num = factory((x) => parseInt(x, 10))
 // const bool = factory((x) => x === 'true')
 const json = factory((x) => JSON.parse(x))
 
-export const MONGO_URI = str(
-  'MONGO_URI',
-  'mongodb://localhost:27017/remotex_center'
-)
-
-export const PLUGINS = json('PLUGINS', ['password-auth'])
+export const CONFIG = {
+  db: {
+    uri: str('MONGO_URI', 'mongodb://localhost:27017/remotex_center')
+  },
+  plugins: json('PLUGINS', ['password-auth']),
+  server: {
+    port: num('SERVER_PORT', 3000),
+    host: str('SERVER_HOST', '127.0.0.1'),
+    cors: json('SERVER_CORS', { origin: true })
+  }
+}

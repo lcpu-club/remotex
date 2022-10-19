@@ -9,12 +9,20 @@
     "start": "node lib/cli.js"
   },
   "dependencies": {
+    "@fastify/cors": "^8.1.0",
     "@trpc/server": "^10.0.0-proxy-beta.21",
     "fastify": "^4.9.0",
+    "fs-extra": "^10.1.0",
+    "minimist": "^1.2.7",
     "mongodb": "^4.10.0",
-    "pino": "^8.6.1"
+    "nanoid": "^4.0.0",
+    "pino": "^8.6.1",
+    "semver": "^7.3.8",
+    "zod": "^3.19.1"
   },
   "devDependencies": {
+    "@types/fs-extra": "^9.0.13",
+    "@types/minimist": "^1.2.2",
     "@types/node": "^18.11.0",
     "@typescript-eslint/eslint-plugin": "^5.40.0",
     "@typescript-eslint/parser": "^5.40.0",

@@ -1,5 +1,5 @@
 import { sep } from 'path'
-import { PLUGINS } from './config.js'
+import { CONFIG } from './config.js'
 import type { Hooks } from './hooks.js'
 import { logger } from './logger.js'
 
@@ -32,7 +32,7 @@ async function loadPlugin(path: string): Promise<Plugin> {
 }
 
 export async function setupPlugins(options: { hooks: Hooks }) {
-  for (const path of PLUGINS) {
+  for (const path of CONFIG.plugins) {
     const plugin = await loadPlugin(path)
     await plugin(options.hooks)
     logger.info(`Loaded plugin ${path}`)

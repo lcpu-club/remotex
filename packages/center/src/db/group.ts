@@ -7,7 +7,7 @@ export interface IGroup {
   policies: IGroupPolicies
 }
 
-export const setupGroupCollection = defineCollectionSetup(({ db }) => {
-  const collection = db.collection('group')
+export const setupGroupCollection = defineCollectionSetup(async ({ db }) => {
+  const collection = db.collection<IGroup>('group')
   return { collection }
 })

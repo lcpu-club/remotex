@@ -1,13 +1,16 @@
 import { IUserAuthSources } from '../mergeables.js'
-import { defineCollectionSetup, IBaseDocument } from './base.js'
+import { defineCollectionSetup } from './base.js'
 
-export interface IUser extends IBaseDocument {
-  username: string
-  group: string
+export interface IUser {
+  _id: string
+  name: string
+  groupId: string
+
   authSources: IUserAuthSources
 }
 
-export const setupUserCollection = defineCollectionSetup(({ db }) => {
-  const collection = db.collection('user')
+export const setupUserCollection = defineCollectionSetup(async ({ db }) => {
+  const collection = db.collection<IUser>('user')
+  await db.createIndex('user_username', { name: 1 }, { unique: true })
   return { collection }
 })
