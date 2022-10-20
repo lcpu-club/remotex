@@ -17,7 +17,16 @@
     "skipLibCheck": true,
     "types": [
       "naive-ui/volar"
-    ]
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "src/*": [
+        "src/*"
+      ],
+      "app/*": [
+        "*"
+      ],
+    }
   },
   "include": [
     "src/**/*.ts",

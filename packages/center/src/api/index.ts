@@ -1,2 +1,2 @@
 export { tRPC } from './trpc.js'
-export { appRouter } from './router.js'
+export { appRouter, AppRouter } from './router.js'

@@ -1,6 +1,6 @@
 <template>
-  <NLayoutFooter>
-    <!--  -->
+  <NLayoutFooter bordered position="absolute" class="h-8">
+    Peking University
   </NLayoutFooter>
 </template>
 
