@@ -1,21 +1,41 @@
 import { MongoClient } from 'mongodb'
-import { CONFIG } from '../config.js'
-import { logger } from '../logger.js'
-import { setupGroupCollection } from './group.js'
-import { setupSystemCollection } from './system.js'
-import { setupTokenCollection } from './token.js'
-import { setupUserCollection } from './user.js'
+import { Initable } from '../util/initable.js'
+import { UserManager } from './user.js'
+import { GroupManager } from './group.js'
+import { SystemManager } from './system.js'
+import { TokenManager } from './token.js'
+import { Logger } from 'pino'
+import { runMitigation } from './mitigation/index.js'
 
-export async function setupDbConn() {
-  const client = new MongoClient(CONFIG.db.uri)
-  await client.connect()
-  logger.info('Connected to MongoDB')
-  const db = client.db()
-  const user = await setupUserCollection({ client, db })
-  const group = await setupGroupCollection({ client, db })
-  const token = await setupTokenCollection({ client, db })
-  const system = await setupSystemCollection({ client, db })
-  return { client, db, user, group, token, system }
+export interface IDbConnInjects {
+  logger: Logger
 }
 
-export type DbConn = Awaited<ReturnType<typeof setupDbConn>>
+export interface IDbConnOptions {
+  uri: string
+}
+
+export class DbConn extends Initable {
+  client
+  db
+  user
+  group
+  token
+  system
+
+  constructor(injects: IDbConnInjects, options: IDbConnOptions) {
+    super(injects.logger)
+    this.client = new MongoClient(options.uri)
+    this.db = this.client.db()
+    this.user = new UserManager(this)
+    this.group = new GroupManager(this)
+    this.token = new TokenManager(this)
+    this.system = new SystemManager(this)
+  }
+
+  async setup(): Promise<void> {
+    await this.client.connect()
+    this.logger.info('Connected to MongoDB')
+    await runMitigation(this)
+  }
+}

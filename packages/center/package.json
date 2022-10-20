@@ -6,24 +6,30 @@
   "main": "lib/index.js",
   "scripts": {
     "build": "tsc",
-    "start": "node lib/cli.js"
+    "start": "node lib/cli/index.js"
   },
   "dependencies": {
     "@fastify/cors": "^8.1.0",
+    "@fastify/sensible": "^5.1.1",
     "@trpc/server": "^10.0.0-proxy-beta.21",
+    "bcrypt": "^5.1.0",
     "fastify": "^4.9.0",
+    "fastify-type-provider-zod": "^1.1.7",
     "fs-extra": "^10.1.0",
     "minimist": "^1.2.7",
     "mongodb": "^4.10.0",
     "nanoid": "^4.0.0",
     "pino": "^8.6.1",
+    "prompts": "^2.4.2",
     "semver": "^7.3.8",
     "zod": "^3.19.1"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.0",
     "@types/fs-extra": "^9.0.13",
     "@types/minimist": "^1.2.2",
     "@types/node": "^18.11.0",
+    "@types/prompts": "^2.4.1",
     "@typescript-eslint/eslint-plugin": "^5.40.0",
     "@typescript-eslint/parser": "^5.40.0",
     "eslint": "^8.25.0",

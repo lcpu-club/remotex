@@ -1,5 +1,6 @@
 import { nanoid } from 'nanoid'
-import { defineCollectionSetup } from './base.js'
+import { Initable } from '../util/index.js'
+import { DbConn } from './index.js'
 
 export interface IToken {
   _id: string
@@ -8,16 +9,25 @@ export interface IToken {
   created: number
 }
 
-export const setupTokenCollection = defineCollectionSetup(async ({ db }) => {
-  const collection = db.collection<IToken>('token')
-  await db.createIndex('token_userId', { userId: 1 })
+export class TokenManager extends Initable {
+  collection
+  constructor(public dbconn: DbConn) {
+    super(dbconn.logger)
+    this.collection = dbconn.db.collection<IToken>('token')
+  }
 
-  async function createToken(userId: string, subject = 'center') {
+  async get(_id: string) {
+    return this.collection.findOne({ _id })
+  }
+
+  async create(userId: string, subject = 'center') {
     const _id = nanoid()
     const created = Date.now()
-    await collection.insertOne({ _id, userId, subject, created })
+    await this.collection.insertOne({ _id, userId, subject, created })
     return _id
   }
 
-  return { collection, createToken }
-})
+  async purge(userId: string) {
+    await this.collection.deleteMany({ userId })
+  }
+}

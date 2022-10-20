@@ -1,4 +1,4 @@
-import type { Mitigation } from '..'
+import type { Mitigation } from '../index.js'
 
 const run: Mitigation = async () => {
   // Nothing to do

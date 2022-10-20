@@ -3,6 +3,8 @@
 
 export interface IUserAuthSources {}
 
-export interface IGroupPolicies {}
+export interface IGroupPolicies {
+  'center:admin': boolean
+}
 
 export interface IHookMap {}

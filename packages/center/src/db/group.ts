@@ -1,13 +1,54 @@
 import { IGroupPolicies } from '../mergeables.js'
-import { defineCollectionSetup } from './base.js'
+import { Initable } from '../util/index.js'
+import { DbConn } from './index.js'
 
 export interface IGroup {
   _id: string
   name: string
-  policies: IGroupPolicies
+  policies: Partial<IGroupPolicies>
 }
 
-export const setupGroupCollection = defineCollectionSetup(async ({ db }) => {
-  const collection = db.collection<IGroup>('group')
-  return { collection }
-})
+export class GroupManager extends Initable {
+  collection
+  constructor(public dbconn: DbConn) {
+    super(dbconn.logger)
+    this.collection = dbconn.db.collection<IGroup>('group')
+  }
+
+  async list() {
+    return this.collection.find().toArray()
+  }
+
+  async create(
+    _id: string,
+    name = _id,
+    policies: Partial<IGroupPolicies> = {}
+  ) {
+    await this.collection.insertOne({ _id, name, policies })
+  }
+
+  async remove(_id: string) {
+    await this.collection.deleteOne({ _id })
+  }
+
+  async getPolicies<K extends keyof IGroupPolicies>(
+    _id: string,
+    policies: K[]
+  ) {
+    const projection = Object.fromEntries(
+      policies.map((k) => [`policies.${k}`, 1])
+    )
+    const group = await this.collection.findOne({ _id }, { projection })
+    if (!group) throw new Error(`Group ${_id} not found`)
+    return group.policies as Pick<IGroupPolicies, K>
+  }
+
+  async setPolicies(_id: string, policies: Partial<IGroupPolicies> = {}) {
+    const update = {
+      $set: Object.fromEntries(
+        Object.entries(policies).map(([k, v]) => [`policies.${k}`, v])
+      )
+    }
+    await this.collection.updateOne({ _id }, update)
+  }
+}

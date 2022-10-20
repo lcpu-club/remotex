@@ -1,11 +1,12 @@
 import minimist from 'minimist'
-import { startApp, startCli } from './index.js'
-import { logger } from './logger.js'
+import { App } from '../app.js'
+import { CONFIG } from '../config/index.js'
+import { CliApp } from './app.js'
 
 const argv = minimist(process.argv.slice(2))
 
 if (argv.v || argv.version) {
-  const source = '../package.json'
+  const source = '../../package.json'
   console.log(
     await import(source, { assert: { type: 'json' } }).then(
       (mod) => mod.default.version
@@ -24,8 +25,11 @@ if (argv.h || argv.help) {
 }
 
 if (argv.s || argv.script) {
-  await startCli(argv.s || argv.script)
+  const app = new CliApp(CONFIG)
+  await app.init()
+  await app.run(argv.s || argv.script)
   process.exit(0)
 }
 
-startApp().catch((err) => logger.error(err))
+const app = new App(CONFIG)
+await app.init()

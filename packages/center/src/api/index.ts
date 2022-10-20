@@ -1,3 +1,2 @@
-import { tRPC } from './trpc.js'
-
-export { tRPC }
+export { tRPC } from './trpc.js'
+export { appRouter } from './router.js'

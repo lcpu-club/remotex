@@ -1,11 +1,11 @@
 import { dirname, join } from 'path'
 import { fileURLToPath, pathToFileURL } from 'url'
 import fs from 'fs-extra'
-import type { DbConn } from '../db/index.js'
 import semver from 'semver'
-import { logger } from '../logger.js'
+import type { DbConn } from '../index.js'
+import { initDatabase } from './init.js'
 
-export type Mitigation = (conn: DbConn) => Promise<void>
+export type Mitigation = (dbconn: DbConn) => Promise<void>
 
 async function loadMitigations() {
   const root = join(dirname(fileURLToPath(import.meta.url)), 'versions')
@@ -24,25 +24,22 @@ async function loadMitigations() {
   )
 }
 
-async function initDatabase(conn: DbConn) {
-  await conn.system.set('version', '0.0.1')
-}
-
-export async function runMitigation(conn: DbConn) {
+export async function runMitigation(dbconn: DbConn) {
+  const logger = dbconn.logger
   const mitigations = await loadMitigations()
   logger.info(`Loaded ${mitigations.length} mitigations`)
-  const doc = await conn.system.collection.findOne({ _id: 'version' })
+  const doc = await dbconn.system.collection.findOne({ _id: 'version' })
   if (!doc) {
     logger.info('Database initializing')
-    await initDatabase(conn)
+    await initDatabase(dbconn)
     logger.info('Database initialized')
   }
-  const version = await conn.system.get('version')
+  const version = await dbconn.system.get('version')
   // TODO: skip mitigations when already at newest version
   for (const mitigation of mitigations) {
     if (semver.lte(mitigation.version, version)) continue
     logger.info(`Running mitigation ${mitigation.version}`)
-    await mitigation.run(conn)
-    await conn.system.set('version', mitigation.version)
+    await mitigation.run(dbconn)
+    await dbconn.system.set('version', mitigation.version)
   }
 }

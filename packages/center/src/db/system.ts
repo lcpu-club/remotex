@@ -1,4 +1,5 @@
-import { defineCollectionSetup } from './base.js'
+import { Initable } from '../util/index.js'
+import { DbConn } from './index.js'
 
 export interface ISystemKV {
   version: string
@@ -9,22 +10,24 @@ export interface ISystem<K extends keyof ISystemKV = keyof ISystemKV> {
   value: ISystemKV[K]
 }
 
-export const setupSystemCollection = defineCollectionSetup(async ({ db }) => {
-  const collection = db.collection<ISystem>('group')
+export class SystemManager extends Initable {
+  collection
+  constructor(public dbconn: DbConn) {
+    super(dbconn.logger)
+    this.collection = dbconn.db.collection<ISystem>('system')
+  }
 
-  async function get<K extends keyof ISystemKV>(key: K): Promise<ISystemKV[K]> {
-    const doc = await collection.findOne({ _id: key })
+  async get<K extends keyof ISystemKV>(key: K): Promise<ISystemKV[K]> {
+    const doc = await this.collection.findOne({ _id: key })
     if (!doc) throw new Error(`System key ${key} not found`)
     return doc.value
   }
 
-  async function set<K extends keyof ISystemKV>(key: K, value: ISystemKV[K]) {
-    await collection.updateOne(
+  async set<K extends keyof ISystemKV>(key: K, value: ISystemKV[K]) {
+    await this.collection.updateOne(
       { _id: key },
       { $set: { value } },
       { upsert: true }
     )
   }
-
-  return { collection, get, set }
-})
+}
