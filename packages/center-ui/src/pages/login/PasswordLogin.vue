@@ -6,8 +6,16 @@
           <div class="text-2xl font-bold">Password Login</div>
         </template>
         <NSpace vertical>
-          <n-input v-model="username" type="text" placeholder="Username" />
-          <n-input v-model="password" type="password" placeholder="Password" />
+          <n-input
+            v-model:value="username"
+            type="text"
+            placeholder="Username"
+          />
+          <n-input
+            v-model:value="password"
+            type="password"
+            placeholder="Password"
+          />
         </NSpace>
         <template #action>
           <NButton class="w-full" type="primary" @click="login">Login</NButton>
@@ -19,8 +27,9 @@
 
 <script setup lang="ts">
 import { NCard, NSpace, NInput, NButton } from 'naive-ui'
-import { getUrl } from 'src/config'
 import { ref } from 'vue'
+import { getUrl } from 'src/config'
+import { post } from 'src/utils/broadcast'
 
 const username = ref('')
 const password = ref('')
@@ -39,7 +48,7 @@ async function login() {
   if (res.ok) {
     const { token } = await res.json()
     localStorage.setItem('authToken', token)
-    window.location.reload()
+    post('reload')
   }
 }
 </script>

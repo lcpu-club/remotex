@@ -19,12 +19,8 @@ export class GroupManager extends Initable {
     return this.collection.find().toArray()
   }
 
-  async create(
-    _id: string,
-    name = _id,
-    policies: Partial<IGroupPolicies> = {}
-  ) {
-    await this.collection.insertOne({ _id, name, policies })
+  async create(_id: string, policies: Partial<IGroupPolicies> = {}) {
+    await this.collection.insertOne({ _id, name: _id, policies })
   }
 
   async remove(_id: string) {

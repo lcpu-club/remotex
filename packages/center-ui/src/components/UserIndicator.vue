@@ -1,13 +1,14 @@
 <template>
   <div>
-    <NSpace>
-      <router-link v-slot="{ navigate }" to="/login" custom>
-        <NButton @click="navigate">Login</NButton>
-      </router-link>
-    </NSpace>
+    <Suspense>
+      <UserIndicatorLoggedIn v-if="isLoggedIn" />
+      <UserIndicatorNotLoggedIn v-else />
+    </Suspense>
   </div>
 </template>
 
 <script setup lang="ts">
-import { NButton, NSpace } from 'naive-ui'
+import { isLoggedIn } from 'src/api'
+import UserIndicatorNotLoggedIn from './UserIndicatorNotLoggedIn.vue'
+import UserIndicatorLoggedIn from './UserIndicatorLoggedIn.vue'
 </script>

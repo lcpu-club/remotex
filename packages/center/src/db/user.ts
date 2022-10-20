@@ -9,7 +9,7 @@ export interface IUser {
   username: string
   groupId: string
 
-  name: string
+  realname: string
 
   authSources: Partial<IUserAuthSources>
 }
@@ -21,15 +21,16 @@ export class UserManager extends Initable {
     this.collection = dbconn.db.collection<IUser>('user')
   }
 
-  async create(name: string, groupId: string) {
+  async create(username: string, groupId: string) {
     const _id = nanoid()
     await this.collection.insertOne({
       _id,
-      username: name,
-      name,
+      username,
+      realname: username,
       groupId,
       authSources: {}
     })
+    return _id
   }
 
   async setGroup(_id: string, groupId: string) {

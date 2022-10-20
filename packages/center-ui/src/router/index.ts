@@ -1,3 +1,4 @@
+import { isLoggedIn } from 'src/api'
 import { createRouter, createWebHashHistory } from 'vue-router'
 
 export const router = createRouter({
@@ -19,4 +20,11 @@ export const router = createRouter({
       component: () => import('src/pages/login/PasswordLogin.vue')
     }
   ]
+})
+
+router.beforeEach((to, from, next) => {
+  if (to.path.startsWith('/login') && isLoggedIn.value) {
+    return next({ path: '/' })
+  }
+  return next()
 })
