@@ -2,8 +2,8 @@ import { initTRPC, TRPCError } from '@trpc/server'
 import { inferAsyncReturnType } from '@trpc/server'
 import { CreateFastifyContextOptions } from '@trpc/server/adapters/fastify'
 import { IToken } from '../db/token.js'
+import { UserInfo } from '../db/user.js'
 import type { IGroupPolicies } from '../mergeables.js'
-import { RemoveNull } from '../util/index.js'
 
 export async function createContext(opts: CreateFastifyContextOptions) {
   const server = opts.res.server
@@ -12,7 +12,8 @@ export async function createContext(opts: CreateFastifyContextOptions) {
     res: opts.res,
     app: server.app,
     dbconn: server.app.dbconn,
-    token: null as IToken | null
+    token: null as never as IToken,
+    user: null as never as UserInfo<'center:access' | 'center:admin'>
   }
 }
 
@@ -24,37 +25,42 @@ export type Meta = {
 
 export const tRPC = initTRPC.context<Context>().meta<Meta>().create()
 
-export const requireLogin = tRPC.middleware(async ({ ctx, next }) => {
+export const router = tRPC.router
+export const middleware = tRPC.middleware
+
+async function loadTokenFromReq(ctx: Context) {
   const tokenId = ctx.req.headers['x-auth-token']
   if (typeof tokenId !== 'string') throw new TRPCError({ code: 'UNAUTHORIZED' })
   const token = await ctx.app.dbconn.token.get(tokenId)
   if (!token) throw new TRPCError({ code: 'UNAUTHORIZED' })
-  ctx.token = token
-  return next({
-    ctx: ctx as RemoveNull<typeof ctx, 'token'>
-  })
+  return token
+}
+
+export const loadUserInfo = middleware(async ({ ctx, next }) => {
+  ctx.token = await loadTokenFromReq(ctx)
+  ctx.user = await ctx.dbconn.user.loadUserInfo(ctx.token, [
+    'center:access',
+    'center:admin'
+  ])
+  return next()
 })
 
-export const requireScope = tRPC.middleware(async ({ ctx, next }) => {
-  if (ctx.token?.subject !== 'center')
+export const requireAccess = middleware(async ({ ctx, next }) => {
+  if (!ctx.user.group.policies['center:access']) {
     throw new TRPCError({ code: 'UNAUTHORIZED' })
+  }
+  return next()
+})
+
+export const requireAdmin = middleware(async ({ ctx, next }) => {
+  if (!ctx.user.group.policies['center:admin']) {
+    throw new TRPCError({ code: 'UNAUTHORIZED' })
+  }
   return next()
 })
 
 export const publicProcedure = tRPC.procedure
 
-export const protectedProcedure = tRPC.procedure
-  .use(requireLogin)
-  .use(requireScope)
-
-export const requireAdmin = tRPC.middleware(async ({ ctx, next }) => {
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const userId = ctx.token!.userId
-  const policies = await ctx.app.dbconn.user.getPolicies(userId, [
-    'center:admin'
-  ])
-  if (!policies['center:admin']) throw new TRPCError({ code: 'UNAUTHORIZED' })
-  return next()
-})
-
-export const adminProcedure = protectedProcedure.use(requireAdmin)
+const loginLoaded = tRPC.procedure.use(loadUserInfo)
+export const protectedProcedure = loginLoaded.use(requireAccess)
+export const adminProcedure = loginLoaded.use(requireAdmin)

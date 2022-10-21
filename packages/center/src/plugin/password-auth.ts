@@ -53,7 +53,7 @@ const plugin: Plugin = (hooks) => {
           user.authSources.password.hash
         )
         if (!result) throw server.httpErrors.forbidden()
-        const token = await dbconn.token.create(user._id)
+        const token = await dbconn.token.createCenterToken(user._id)
         return { token }
       }
     )

@@ -13,6 +13,7 @@ export interface IGroupAttributes {
 }
 
 export interface IGroupPolicies {
+  'center:access': boolean
   'center:admin': boolean
 }
 

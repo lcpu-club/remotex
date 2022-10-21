@@ -1,8 +1,8 @@
 import { adminRouter } from './admin.js'
-import { tRPC } from './trpc.js'
+import { router } from './trpc.js'
 import { userRouter } from './user.js'
 
-export const appRouter = tRPC.router({
+export const appRouter = router({
   user: userRouter,
   admin: adminRouter
 })

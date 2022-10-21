@@ -6,7 +6,9 @@ import {
   IUserAuthSources
 } from '../mergeables.js'
 import { Initable } from '../util/initable.js'
+import { IGroup } from './group.js'
 import { DbConn } from './index.js'
+import { IToken } from './token.js'
 
 export interface IUser {
   _id: string
@@ -15,6 +17,15 @@ export interface IUser {
 
   attributes: Partial<IUserAttributes>
   authSources: Partial<IUserAuthSources>
+}
+
+export type UserInfo<K extends keyof IGroupPolicies> = Pick<
+  IUser,
+  '_id' | 'username' | 'attributes'
+> & {
+  group: Pick<IGroup, '_id' | 'attributes'> & {
+    policies: Pick<IGroupPolicies, K>
+  }
 }
 
 export class UserManager extends Initable {
@@ -43,16 +54,20 @@ export class UserManager extends Initable {
     await this.collection.updateOne({ _id }, { $set: { groupId } })
   }
 
-  async getPolicies<K extends keyof IGroupPolicies>(
-    _id: string,
+  async loadUserInfo<K extends keyof IGroupPolicies>(
+    token: IToken,
     policies: K[]
   ) {
+    const { userId, prefixes } = token
+    if (policies.some((p) => !prefixes.some((x) => p.startsWith(x)))) {
+      throw new Error('Bad token')
+    }
     const projection = Object.fromEntries(
-      policies.map((k) => [`policies.${k}`, 1])
+      policies.map((k) => [`group.policies.${k}`, 1])
     )
-    const group = await this.dbconn.user.collection
+    const user = await this.collection
       .aggregate([
-        { $match: { _id } },
+        { $match: { _id: userId } },
         {
           $lookup: {
             from: 'group',
@@ -62,12 +77,19 @@ export class UserManager extends Initable {
           }
         },
         { $unwind: '$group' },
-        { $replaceRoot: { newRoot: '$group' } },
-        { $project: projection }
+        {
+          $project: {
+            _id: 1,
+            username: 1,
+            attributes: 1,
+            'group._id': 1,
+            'group.attributes': 1,
+            ...projection
+          }
+        }
       ])
       .next()
-    if (!group) throw new Error(`Group ${_id} not found`)
-    return group.policies as Pick<IGroupPolicies, K>
+    return user as UserInfo<K>
   }
 
   async getAuthSource<K extends keyof IUserAuthSources>(

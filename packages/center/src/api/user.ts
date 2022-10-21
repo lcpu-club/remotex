@@ -1,8 +1,8 @@
 import { IGroup } from '../db/group.js'
 import { IUser } from '../db/user.js'
-import { protectedProcedure, tRPC } from './trpc.js'
+import { protectedProcedure, router } from './trpc.js'
 
-export const userRouter = tRPC.router({
+export const userRouter = router({
   info: protectedProcedure.query(async ({ ctx }) => {
     const user = await ctx.dbconn.user.collection
       .aggregate([

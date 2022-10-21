@@ -1,6 +1,6 @@
 import { CONFIG } from '../config/index.js'
-import { adminProcedure, tRPC } from './trpc.js'
+import { adminProcedure, router } from './trpc.js'
 
-export const adminRouter = tRPC.router({
+export const adminRouter = router({
   config: adminProcedure.query(async () => CONFIG)
 })
