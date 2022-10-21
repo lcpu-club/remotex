@@ -1,6 +1,10 @@
 import { Filter } from 'mongodb'
 import { nanoid } from 'nanoid'
-import { IGroupPolicies, IUserAuthSources } from '../mergeables.js'
+import {
+  IGroupPolicies,
+  IUserAttributes,
+  IUserAuthSources
+} from '../mergeables.js'
 import { Initable } from '../util/initable.js'
 import { DbConn } from './index.js'
 
@@ -9,8 +13,7 @@ export interface IUser {
   username: string
   groupId: string
 
-  realname: string
-
+  attributes: Partial<IUserAttributes>
   authSources: Partial<IUserAuthSources>
 }
 
@@ -26,8 +29,10 @@ export class UserManager extends Initable {
     await this.collection.insertOne({
       _id,
       username,
-      realname: username,
       groupId,
+      attributes: {
+        realname: username
+      },
       authSources: {}
     })
     return _id

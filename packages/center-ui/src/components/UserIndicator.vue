@@ -1,9 +1,7 @@
 <template>
   <div>
-    <Suspense>
-      <UserIndicatorLoggedIn v-if="isLoggedIn" />
-      <UserIndicatorNotLoggedIn v-else />
-    </Suspense>
+    <UserIndicatorLoggedIn v-if="isLoggedIn" />
+    <UserIndicatorNotLoggedIn v-else />
   </div>
 </template>
 

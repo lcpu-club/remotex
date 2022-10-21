@@ -11,6 +11,7 @@ export async function createContext(opts: CreateFastifyContextOptions) {
     req: opts.req,
     res: opts.res,
     app: server.app,
+    dbconn: server.app.dbconn,
     token: null as IToken | null
   }
 }
@@ -24,7 +25,7 @@ export type Meta = {
 export const tRPC = initTRPC.context<Context>().meta<Meta>().create()
 
 export const requireLogin = tRPC.middleware(async ({ ctx, next }) => {
-  const tokenId = ctx.req.headers['X-Auth-Token']
+  const tokenId = ctx.req.headers['x-auth-token']
   if (typeof tokenId !== 'string') throw new TRPCError({ code: 'UNAUTHORIZED' })
   const token = await ctx.app.dbconn.token.get(tokenId)
   if (!token) throw new TRPCError({ code: 'UNAUTHORIZED' })

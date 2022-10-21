@@ -37,11 +37,23 @@ const plugin: Plugin = (hooks) => {
       },
       async (req) => {
         const { username, password } = req.body
-        const source = await dbconn.user.getAuthSource({ username }, 'password')
-        if (!source) throw server.httpErrors.forbidden()
-        const result = await bcrypt.compare(password, source.hash)
+        const user = await dbconn.user.collection.findOne(
+          { username },
+          {
+            projection: {
+              _id: 1,
+              'authSources.password': 1
+            }
+          }
+        )
+        if (!user || !user.authSources.password)
+          throw server.httpErrors.forbidden()
+        const result = await bcrypt.compare(
+          password,
+          user.authSources.password.hash
+        )
         if (!result) throw server.httpErrors.forbidden()
-        const token = await dbconn.token.create(username)
+        const token = await dbconn.token.create(user._id)
         return { token }
       }
     )

@@ -1,10 +1,10 @@
-import { IGroupPolicies } from '../mergeables.js'
+import { IGroupAttributes, IGroupPolicies } from '../mergeables.js'
 import { Initable } from '../util/index.js'
 import { DbConn } from './index.js'
 
 export interface IGroup {
   _id: string
-  name: string
+  attributes: Partial<IGroupAttributes>
   policies: Partial<IGroupPolicies>
 }
 
@@ -20,7 +20,7 @@ export class GroupManager extends Initable {
   }
 
   async create(_id: string, policies: Partial<IGroupPolicies> = {}) {
-    await this.collection.insertOne({ _id, name: _id, policies })
+    await this.collection.insertOne({ _id, attributes: {}, policies })
   }
 
   async remove(_id: string) {

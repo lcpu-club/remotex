@@ -1,6 +1,10 @@
 <template>
-  <NLayoutFooter bordered position="absolute" class="h-8">
-    Peking University
+  <NLayoutFooter
+    bordered
+    position="absolute"
+    class="h-8 flex items-center justify-center"
+  >
+    Linux Club of Peking University
   </NLayoutFooter>
 </template>
 

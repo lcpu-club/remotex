@@ -1,17 +1,13 @@
 import minimist from 'minimist'
 import { App } from '../app.js'
 import { CONFIG } from '../config/index.js'
+import { VERSION } from '../util/index.js'
 import { CliApp } from './app.js'
 
 const argv = minimist(process.argv.slice(2))
 
 if (argv.v || argv.version) {
-  const source = '../../package.json'
-  console.log(
-    await import(source, { assert: { type: 'json' } }).then(
-      (mod) => mod.default.version
-    )
-  )
+  console.log(VERSION)
   process.exit(0)
 }
 

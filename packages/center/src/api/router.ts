@@ -1,9 +1,9 @@
 import { adminRouter } from './admin.js'
 import { tRPC } from './trpc.js'
-import { uiRouter } from './ui.js'
+import { userRouter } from './user.js'
 
 export const appRouter = tRPC.router({
-  ui: uiRouter,
+  user: userRouter,
   admin: adminRouter
 })
 export type AppRouter = typeof appRouter
