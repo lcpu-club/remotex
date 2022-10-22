@@ -15,12 +15,26 @@ const plugin: Plugin = (hooks) => {
   hooks.hook('post-plugin-setup', ({ logger }) => {
     logger.info('Setting up password auth plugin')
   })
+  hooks.hook('post-dbconn-setup', async (dbconn) => {
+    await dbconn.user.collection.createIndex(
+      { 'attributes.username': 1 },
+      { unique: true }
+    )
+  })
   hooks.hook('post-script-setup', (scripts) => {
     scripts.addScript('password:set-password', async (app) => {
-      const userId = await askString('User ID')
+      const username = await askString('Username')
+      const user = await app.dbconn.user.collection.findOne(
+        { 'attributes.username': username },
+        { projection: { _id: 1 } }
+      )
+      if (!user) {
+        console.log('User not found')
+        return
+      }
       const password = await askString('Password')
       const hash = await bcrypt.hash(password, 10)
-      await app.dbconn.user.setAuthSource(userId, 'password', { hash })
+      await app.dbconn.user.setAuthSource(user._id, 'password', { hash })
     })
   })
   hooks.hook('post-server-setup', (app) => {
@@ -38,7 +52,7 @@ const plugin: Plugin = (hooks) => {
       async (req) => {
         const { username, password } = req.body
         const user = await dbconn.user.collection.findOne(
-          { username },
+          { 'attributes.username': username },
           {
             projection: {
               _id: 1,

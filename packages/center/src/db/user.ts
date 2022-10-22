@@ -12,7 +12,6 @@ import { IToken } from './token.js'
 
 export interface IUser {
   _id: string
-  username: string
   groupId: string
 
   attributes: Partial<IUserAttributes>
@@ -21,7 +20,7 @@ export interface IUser {
 
 export type UserInfo<K extends keyof IGroupPolicies> = Pick<
   IUser,
-  '_id' | 'username' | 'attributes'
+  '_id' | 'attributes'
 > & {
   group: Pick<IGroup, '_id' | 'attributes'> & {
     policies: Pick<IGroupPolicies, K>
@@ -39,10 +38,9 @@ export class UserManager extends Initable {
     const _id = nanoid()
     await this.collection.insertOne({
       _id,
-      username,
       groupId,
       attributes: {
-        realname: username
+        username
       },
       authSources: {}
     })
@@ -80,7 +78,6 @@ export class UserManager extends Initable {
         {
           $project: {
             _id: 1,
-            username: 1,
             attributes: 1,
             'group._id': 1,
             'group.attributes': 1,

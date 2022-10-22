@@ -23,7 +23,10 @@ export const client = createTRPCProxyClient<AppRouter>({
 
 async function getUserInfo() {
   try {
-    return await client.user.info.query()
+    return await client.public.verify.query({
+      token: authToken.value,
+      policies: ['center:access', 'center:admin']
+    })
   } catch (err) {
     if (err instanceof TRPCClientError) {
       authToken.value = ''
@@ -33,7 +36,8 @@ async function getUserInfo() {
   return null
 }
 
-type UserInfo = NonNullable<Awaited<ReturnType<typeof getUserInfo>>>
+export type UserInfo = NonNullable<Awaited<ReturnType<typeof getUserInfo>>>
+export type GroupInfo = UserInfo['group']
 
 export const userInfo = useLocalStorage<UserInfo>('userInfo', null as never, {
   deep: true

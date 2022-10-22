@@ -1,3 +1,4 @@
+import { Filter } from 'mongodb'
 import { nanoid } from 'nanoid'
 import { IGroupPolicies } from '../mergeables.js'
 import { Initable } from '../util/index.js'
@@ -7,6 +8,7 @@ const THREE_MONTHS = 1000 * 60 * 60 * 24 * 90
 
 export interface IToken {
   _id: string
+  value: string
   type: 'pre' | 'web' | 'app'
   userId: string
   prefixes: string[]
@@ -22,17 +24,26 @@ export class TokenManager extends Initable {
     this.collection = dbconn.db.collection<IToken>('token')
   }
 
-  async get(_id: string) {
-    const token = await this.collection.findOne({ _id })
+  async get(where: Filter<IToken>) {
+    const token = await this.collection.findOne(where, {
+      projection: { value: 0 }
+    })
     if (!token) throw new Error('Bad token')
     return token
   }
 
-  async create(info: Omit<IToken, '_id' | 'createdAt' | 'usedAt'>) {
+  async create(info: Omit<IToken, '_id' | 'value' | 'createdAt' | 'usedAt'>) {
     const _id = nanoid()
+    const value = nanoid()
     const createdAt = Date.now()
-    await this.collection.insertOne({ _id, ...info, createdAt, usedAt: 0 })
-    return _id
+    await this.collection.insertOne({
+      _id,
+      value,
+      ...info,
+      createdAt,
+      usedAt: 0
+    })
+    return value
   }
 
   async createCenterToken(userId: string) {
@@ -50,10 +61,10 @@ export class TokenManager extends Initable {
   }
 
   async loadUserInfo<K extends keyof IGroupPolicies>(
-    _id: string,
+    value: string,
     policies: K[]
   ) {
-    const token = await this.get(_id)
+    const token = await this.get({ value })
     return this.dbconn.user.loadUserInfo(token, policies)
   }
 }

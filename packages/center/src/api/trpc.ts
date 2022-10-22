@@ -29,9 +29,9 @@ export const router = tRPC.router
 export const middleware = tRPC.middleware
 
 async function loadTokenFromReq(ctx: Context) {
-  const tokenId = ctx.req.headers['x-auth-token']
-  if (typeof tokenId !== 'string') throw new TRPCError({ code: 'UNAUTHORIZED' })
-  const token = await ctx.app.dbconn.token.get(tokenId)
+  const value = ctx.req.headers['x-auth-token']
+  if (typeof value !== 'string') throw new TRPCError({ code: 'UNAUTHORIZED' })
+  const token = await ctx.app.dbconn.token.get({ value })
   if (!token) throw new TRPCError({ code: 'UNAUTHORIZED' })
   return token
 }

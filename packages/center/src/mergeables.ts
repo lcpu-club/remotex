@@ -2,6 +2,7 @@
 // This file contains mergeable interfaces
 
 export interface IUserAttributes {
+  username: string
   realname: string
   email: string
 }

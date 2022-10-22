@@ -13,6 +13,7 @@ import { HookManager } from './hook/index.js'
 import { IPluginManagerOptions, PluginManager } from './plugin/index.js'
 import { Initable } from './util/index.js'
 import { Router } from '@trpc/server'
+import * as tRPC from './api/trpc.js'
 import { createContext } from './api/trpc.js'
 import { appRouter } from './api/router.js'
 
@@ -20,7 +21,7 @@ declare module './mergeables.js' {
   interface IHookMap {
     'post-dbconn-setup': [DbConn]
     'post-plugin-setup': [PluginManager]
-    'post-server-setup': [App]
+    'post-server-setup': [App, typeof tRPC]
   }
 }
 
@@ -68,7 +69,7 @@ export class App extends Initable {
     this.server.register(fastifyCors, this.options.cors)
     this.server.register(fastifySensible)
     this.mount('/trpc', appRouter)
-    await this.hooks.fire('post-server-setup', this)
+    await this.hooks.fire('post-server-setup', this, tRPC)
     await this.server.listen({
       host: this.options.host,
       port: this.options.port

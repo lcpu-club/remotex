@@ -1,12 +1,19 @@
 <template>
   <div class="p-6 w-full">
-    <UserHome v-if="isLoggedIn" />
-    <PreLogin v-else />
+    <div class="w-full flex flex-col items-center">
+      <div class="font-bold text-5xl">RemoTeX</div>
+      <div class="text-2xl">
+        Next generation <b>Remo</b>te <b>TeX</b> experience
+      </div>
+      <div v-if="isLoggedIn">
+        Welcome,
+        {{ userInfo.attributes.realname ?? userInfo.attributes.username }}
+      </div>
+      <div v-else>Login to get started</div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import PreLogin from '../components/PreLogin.vue'
-import UserHome from 'src/components/UserHome.vue'
-import { isLoggedIn } from 'src/api'
+import { isLoggedIn, userInfo } from 'src/api'
 </script>

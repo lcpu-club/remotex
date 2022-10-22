@@ -24,7 +24,7 @@ export const CONFIG: IAppOptions & ICliAppOptions = {
     uri: str('MONGO_URI', 'mongodb://localhost:27017/remotex_center')
   },
   plugins: {
-    plugins: json('PLUGINS', ['password-auth'])
+    plugins: json('PLUGINS', ['rest', 'password-auth'])
   },
   port: num('SERVER_PORT', 3000),
   host: str('SERVER_HOST', '127.0.0.1'),
