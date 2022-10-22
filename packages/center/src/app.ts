@@ -1,6 +1,7 @@
 import fastify from 'fastify'
 import fastifyCors, { FastifyCorsOptions } from '@fastify/cors'
 import fastifySensible from '@fastify/sensible'
+import fastifyStatic from '@fastify/static'
 import { fastifyTRPCPlugin } from '@trpc/server/adapters/fastify'
 import {
   serializerCompiler,
@@ -39,6 +40,7 @@ export interface IAppOptions {
   cors: FastifyCorsOptions
   host: string
   port: number
+  static: string
 }
 
 export class App extends Initable {
@@ -75,6 +77,9 @@ export class App extends Initable {
     await this.server.register(fastifySensible)
     await this.mount('/trpc', appRouter)
     await this.hooks.fire('post-server-setup', this, tRPC)
+    await this.server.register(fastifyStatic, {
+      root: this.options.static
+    })
     await this.server.listen({
       host: this.options.host,
       port: this.options.port

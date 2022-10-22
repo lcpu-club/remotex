@@ -1,5 +1,7 @@
+import { join } from 'path'
 import type { IAppOptions } from '../app.js'
 import type { ICliAppOptions } from '../cli/app.js'
+import { APP_ROOT } from '../util/misc.js'
 
 const PREFIX = 'CENTER_'
 const factory =
@@ -28,5 +30,6 @@ export const CONFIG: IAppOptions & ICliAppOptions = {
   },
   port: num('SERVER_PORT', 3000),
   host: str('SERVER_HOST', '127.0.0.1'),
-  cors: json('SERVER_CORS', { origin: true })
+  cors: json('SERVER_CORS', { origin: true }),
+  static: str('STATIC_DIR', join(APP_ROOT, 'public'))
 }
