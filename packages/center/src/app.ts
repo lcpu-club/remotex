@@ -41,6 +41,7 @@ export interface IAppOptions {
   host: string
   port: number
   static: string
+  trustProxy: boolean | string | string[] | number
 }
 
 export class App extends Initable {
@@ -60,7 +61,7 @@ export class App extends Initable {
       { logger, hooks: this.hooks },
       options.plugins
     )
-    const server = fastify({ logger })
+    const server = fastify({ logger, trustProxy: options.trustProxy })
     server.setValidatorCompiler(validatorCompiler)
     server.setSerializerCompiler(serializerCompiler)
     this.server = server.withTypeProvider<ZodTypeProvider>()

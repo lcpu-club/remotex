@@ -31,5 +31,6 @@ export const CONFIG: IAppOptions & ICliAppOptions = {
   port: num('SERVER_PORT', 3000),
   host: str('SERVER_HOST', '127.0.0.1'),
   cors: json('SERVER_CORS', { origin: true }),
-  static: str('STATIC_DIR', join(APP_ROOT, 'public'))
+  static: str('STATIC_DIR', join(APP_ROOT, 'public')),
+  trustProxy: json('TRUST_PROXY', false)
 }
