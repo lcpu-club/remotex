@@ -10,5 +10,8 @@ export default defineConfig({
       src: join(__dirname, 'src'),
       app: __dirname
     }
+  },
+  build: {
+    target: 'esnext'
   }
 })

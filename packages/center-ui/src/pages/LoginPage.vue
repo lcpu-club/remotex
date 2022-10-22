@@ -9,11 +9,24 @@
         <NDivider />
         <NSpace vertical>
           <template v-for="(method, i) of config.loginMethods" :key="i">
-            <router-link v-slot="{ navigate }" :to="method.target" custom>
+            <router-link
+              v-if="method.target"
+              v-slot="{ navigate }"
+              :to="method.target"
+              custom
+            >
               <NButton @click="navigate" class="w-full">
                 {{ method.name }}
               </NButton>
             </router-link>
+            <NButton
+              v-else-if="method.href"
+              tag="a"
+              :href="method.href"
+              class="w-full"
+            >
+              {{ method.name }}
+            </NButton>
           </template>
         </NSpace>
       </NCard>

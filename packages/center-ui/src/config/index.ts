@@ -1,6 +1,7 @@
 export interface ILoginMethod {
   name: string
-  target: string
+  target?: string
+  href?: string
 }
 
 export interface IRuntimeConfig {
@@ -9,7 +10,7 @@ export interface IRuntimeConfig {
 }
 
 export const config: IRuntimeConfig = {
-  baseUrl: 'http://localhost:3000/',
+  baseUrl: window.location.pathname,
   loginMethods: [
     { name: 'Password', target: '/login/password' }
     // More login methods here
@@ -21,4 +22,12 @@ export function getUrl(path: string) {
   if (base.endsWith('/')) base = base.slice(0, -1)
   if (path.startsWith('/')) path = path.slice(1)
   return base + '/' + path
+}
+
+try {
+  const resp = await fetch('config.json')
+  const data = await resp.json()
+  Object.assign(config, data)
+} catch (err) {
+  console.log(err)
 }

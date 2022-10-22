@@ -13,7 +13,10 @@ const plugin: Plugin = (hooks) => {
         schema: {
           body: z.object({
             token: z.string(),
-            policies: z.string().regex(/^[a-zA-Z0-9:]+$/)
+            policies: z
+              .array(z.string().regex(/^[a-zA-Z0-9:]+$/))
+              .min(1)
+              .max(50)
           })
         }
       },
