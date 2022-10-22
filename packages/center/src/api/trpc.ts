@@ -3,7 +3,7 @@ import { inferAsyncReturnType } from '@trpc/server'
 import { CreateFastifyContextOptions } from '@trpc/server/adapters/fastify'
 import { IToken } from '../db/token.js'
 import { UserInfo } from '../db/user.js'
-import type { IGroupPolicies } from '../mergeables.js'
+import type { IGroupPolicies } from '../contribution/index.js'
 
 export async function createContext(opts: CreateFastifyContextOptions) {
   const server = opts.res.server

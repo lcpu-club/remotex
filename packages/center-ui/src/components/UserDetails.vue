@@ -1,18 +1,22 @@
 <template>
   <NDescriptions label-placement="left" :columns="1">
     <n-descriptions-item label="User Name">
-      {{ userInfo.attributes.username }}
+      {{ props.user.attributes?.username }}
     </n-descriptions-item>
     <n-descriptions-item label="Real Name">
-      {{ userInfo.attributes.realname }}
+      {{ props.user.attributes?.nickname }}
     </n-descriptions-item>
     <n-descriptions-item label="Email">
-      {{ userInfo.attributes.email ?? 'not set' }}
+      {{ props.user.attributes?.email }}
     </n-descriptions-item>
   </NDescriptions>
 </template>
 
 <script setup lang="ts">
 import { NDescriptions, NDescriptionsItem } from 'naive-ui'
-import { userInfo } from 'src/api'
+import { IUser } from 'src/api'
+
+const props = defineProps<{
+  user: Partial<IUser>
+}>()
 </script>

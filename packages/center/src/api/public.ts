@@ -6,7 +6,7 @@ export const publicRouter = router({
     .input(
       z.object({
         token: z.string(),
-        policies: z.array(z.string()).min(1).max(5)
+        policies: z.array(z.string()).min(1).max(50)
       })
     )
     .query(async ({ ctx, input }) => {

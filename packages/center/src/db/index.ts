@@ -1,9 +1,9 @@
 import { MongoClient } from 'mongodb'
 import { Initable } from '../util/initable.js'
-import { UserManager } from './user.js'
-import { GroupManager } from './group.js'
-import { SystemManager } from './system.js'
-import { TokenManager } from './token.js'
+import { IUser, UserManager } from './user.js'
+import { IGroup, GroupManager } from './group.js'
+import { ISystem, SystemManager } from './system.js'
+import { IToken, TokenManager } from './token.js'
 import { Logger } from 'pino'
 import { runMitigation } from './mitigation/index.js'
 
@@ -39,3 +39,5 @@ export class DbConn extends Initable {
     await runMitigation(this)
   }
 }
+
+export { IUser, IGroup, ISystem, IToken }

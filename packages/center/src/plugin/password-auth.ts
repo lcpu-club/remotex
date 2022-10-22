@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt'
 import type { Plugin } from '../index.js'
 import { askString } from '../util/index.js'
 
-declare module '../mergeables.js' {
+declare module '../contribution/index.js' {
   interface IUserAuthSources {
     password: {
       hash: string
@@ -14,6 +14,11 @@ declare module '../mergeables.js' {
 const plugin: Plugin = (hooks) => {
   hooks.hook('post-plugin-setup', ({ logger }) => {
     logger.info('Setting up password auth plugin')
+  })
+  hooks.hook('post-contribution-setup', (contrib) => {
+    contrib.userAuthSources.set('password', {
+      description: 'Password Login'
+    })
   })
   hooks.hook('post-dbconn-setup', async (dbconn) => {
     await dbconn.user.collection.createIndex(

@@ -7,7 +7,7 @@
       </div>
       <div v-if="isLoggedIn">
         Welcome,
-        {{ userInfo.attributes.realname ?? userInfo.attributes.username }}
+        {{ userInfo.attributes.nickname ?? userInfo.attributes.username }}
       </div>
       <div v-else>Login to get started</div>
     </div>

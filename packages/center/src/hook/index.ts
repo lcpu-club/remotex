@@ -1,5 +1,5 @@
 import { Logger } from 'pino'
-import { IHookMap } from '../mergeables.js'
+import { IHookMap } from '../contribution/index.js'
 
 type HookName = keyof IHookMap
 type HookCallback<N extends HookName> = (

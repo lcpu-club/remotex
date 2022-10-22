@@ -1,4 +1,5 @@
-import { IGroupAttributes, IGroupPolicies } from '../mergeables.js'
+import { Filter } from 'mongodb'
+import { IGroupAttributes, IGroupPolicies } from '../contribution/index.js'
 import { Initable } from '../util/index.js'
 import { DbConn } from './index.js'
 
@@ -15,8 +16,14 @@ export class GroupManager extends Initable {
     this.collection = dbconn.db.collection<IGroup>('group')
   }
 
-  async list() {
-    return this.collection.find().toArray()
+  async get(where: Filter<IGroup>) {
+    const group = await this.collection.findOne(where)
+    if (!group) throw new Error('Group not found')
+    return group
+  }
+
+  async list(where: Filter<IGroup>) {
+    return this.collection.find(where).toArray()
   }
 
   async create(_id: string, policies: Partial<IGroupPolicies> = {}) {

@@ -6,9 +6,11 @@
       </template>
       <NTabs type="line" animated default-value="details">
         <NTabPane name="details" tab="Details">
-          <UserDetails />
+          <UserDetails :user="userInfo" />
         </NTabPane>
-        <NTabPane name="group" tab="Group"> Group </NTabPane>
+        <NTabPane name="group" tab="Group">
+          <MyGroupDetails />
+        </NTabPane>
         <NTabPane name="tokens" tab="Tokens"> Tokens </NTabPane>
       </NTabs>
     </NCard>
@@ -17,5 +19,7 @@
 
 <script setup lang="ts">
 import { NCard, NTabs, NTabPane } from 'naive-ui'
+import { userInfo } from 'src/api'
 import UserDetails from '../components/UserDetails.vue'
+import MyGroupDetails from 'src/components/MyGroupDetails.vue'
 </script>

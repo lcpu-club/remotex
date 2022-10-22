@@ -1,11 +1,11 @@
 import { Filter } from 'mongodb'
 import { nanoid } from 'nanoid'
 import {
-  IGroupPolicies,
   IUserAttributes,
+  IGroupPolicies,
   IUserAuthSources
-} from '../mergeables.js'
-import { Initable } from '../util/initable.js'
+} from '../contribution/index.js'
+import { Initable } from '../util/index.js'
 import { IGroup } from './group.js'
 import { DbConn } from './index.js'
 import { IToken } from './token.js'

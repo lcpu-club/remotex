@@ -1,6 +1,6 @@
 import { Filter } from 'mongodb'
 import { nanoid } from 'nanoid'
-import { IGroupPolicies } from '../mergeables.js'
+import { IGroupPolicies } from '../contribution/index.js'
 import { Initable } from '../util/index.js'
 import { DbConn } from './index.js'
 
@@ -9,7 +9,7 @@ const THREE_MONTHS = 1000 * 60 * 60 * 24 * 90
 export interface IToken {
   _id: string
   value: string
-  type: 'pre' | 'web' | 'app'
+  type: 'web' | 'app'
   userId: string
   prefixes: string[]
   createdAt: number
@@ -30,6 +30,10 @@ export class TokenManager extends Initable {
     })
     if (!token) throw new Error('Bad token')
     return token
+  }
+
+  async list(where: Filter<IToken>) {
+    return this.collection.find(where, { projection: { value: 0 } }).toArray()
   }
 
   async create(info: Omit<IToken, '_id' | 'value' | 'createdAt' | 'usedAt'>) {

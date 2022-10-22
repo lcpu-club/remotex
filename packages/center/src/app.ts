@@ -16,9 +16,11 @@ import { Router } from '@trpc/server'
 import * as tRPC from './api/trpc.js'
 import { createContext } from './api/trpc.js'
 import { appRouter } from './api/router.js'
+import { ContributionManager } from './contribution/index.js'
 
-declare module './mergeables.js' {
+declare module './contribution/index.js' {
   interface IHookMap {
+    'post-contribution-setup': [ContributionManager]
     'post-dbconn-setup': [DbConn]
     'post-plugin-setup': [PluginManager]
     'post-server-setup': [App, typeof tRPC]
@@ -40,6 +42,7 @@ export interface IAppOptions {
 }
 
 export class App extends Initable {
+  contributions
   hooks
   dbconn
   plugins
@@ -48,6 +51,7 @@ export class App extends Initable {
   constructor(public options: IAppOptions) {
     const logger = pino()
     super(logger)
+    this.contributions = new ContributionManager()
     this.hooks = new HookManager({ logger })
     this.dbconn = new DbConn({ logger }, options.db)
     this.plugins = new PluginManager(
@@ -62,13 +66,14 @@ export class App extends Initable {
   }
 
   async init() {
-    await this.dbconn.init()
-    this.hooks.fire('post-dbconn-setup', this.dbconn)
     await this.plugins.init()
-    this.hooks.fire('post-plugin-setup', this.plugins)
-    this.server.register(fastifyCors, this.options.cors)
-    this.server.register(fastifySensible)
-    this.mount('/trpc', appRouter)
+    await this.hooks.fire('post-plugin-setup', this.plugins)
+    await this.hooks.fire('post-contribution-setup', this.contributions)
+    await this.dbconn.init()
+    await this.hooks.fire('post-dbconn-setup', this.dbconn)
+    await this.server.register(fastifyCors, this.options.cors)
+    await this.server.register(fastifySensible)
+    await this.mount('/trpc', appRouter)
     await this.hooks.fire('post-server-setup', this, tRPC)
     await this.server.listen({
       host: this.options.host,
@@ -79,7 +84,7 @@ export class App extends Initable {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   mount(prefix: string, router: Router<any>) {
-    this.server.register(fastifyTRPCPlugin, {
+    return this.server.register(fastifyTRPCPlugin, {
       prefix,
       trpcOptions: {
         router,

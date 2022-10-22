@@ -5,7 +5,7 @@ import { IPluginManagerOptions, PluginManager } from '../plugin/index.js'
 import { Initable } from '../util/index.js'
 import { ScriptManager } from './script/index.js'
 
-declare module '../mergeables.js' {
+declare module '../contribution/index.js' {
   interface IHookMap {
     ['post-script-setup']: [ScriptManager]
   }
